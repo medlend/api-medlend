@@ -1,0 +1,3 @@
+medlend_homepage:
+    path:     /
+    defaults: { _controller: MedlendBundle:Default:index }
