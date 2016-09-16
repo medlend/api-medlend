@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 15/09/16
- * Time: 14:59
+ * Date: 16/09/16
+ * Time: 09:30
  */
 
 namespace AppBundle\Form\Type;
@@ -11,22 +11,21 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
-class UserType extends AbstractType
+class PriceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('firstname');
-        $builder->add('lastname');
-        $builder->add('plainPassword'); // Rajout du mot de passe
-        $builder->add('email', EmailType::class);
+        /* Pas besoin de rajouter les options avec ChoiceType vu que nous allons l'utiliser via API.
+         Le formulaire ne sera jamais affiché */
+        $builder->add('type');
+        $builder->add('value');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'AppBundle\Entity\User',
+            'data_class' => 'AppBundle\Entity\Price',
             'csrf_protection' => false
         ]);
     }

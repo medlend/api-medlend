@@ -23,3 +23,58 @@ AppBundle\Entity\User:
         email:
             - NotBlank: ~
             - Email: ~
+        plainPassword:
+            - NotBlank: { groups: [New, FullUpdate] }
+            - Type: string
+            - Length:
+                min: 4
+                max: 50
+
+AppBundle\Entity\Price:
+    properties:
+        type:
+            - NotNull: ~
+            - Choice:
+                choices: [less_than_12, for_all]
+        value:
+            - NotNull: ~
+            - Type: numeric
+            - GreaterThanOrEqual:
+                value: 0
+
+AppBundle\Entity\Theme:
+    properties:
+        name:
+            - NotNull: ~
+            - Choice:
+                choices: [art, architecture, history, science-fiction, sport]
+        value:
+            - NotNull: ~
+            - Type: numeric
+            - GreaterThan:
+                value: 0
+            - LessThanOrEqual:
+                value: 10
+
+AppBundle\Entity\Preference:
+    properties:
+        name:
+            - NotNull: ~
+            - Choice:
+                choices: [art, architecture, history, science-fiction, sport]
+        value:
+            - NotNull: ~
+            - Type: numeric
+            - GreaterThan:
+                value: 0
+            - LessThanOrEqual:
+                value: 10
+
+AppBundle\Entity\Credentials:
+    properties:
+        login:
+            - NotBlank: ~
+            - Type: string
+        password:
+            - NotBlank: ~
+            - Type: string

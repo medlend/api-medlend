@@ -36,6 +36,52 @@ class Place
      */
     protected $address;
 
+
+    /**
+     * @ORM\OneToMany(targetEntity="Price", mappedBy="place")
+     * @var Price[]
+     */
+    protected $prices;
+
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="Theme", mappedBy="place")
+     * @var Theme[]
+     */
+    protected $themes;
+
+    public function __construct()
+    {
+        $this->prices = new ArrayCollection();
+        $this->themes = new ArrayCollection();
+    }
+
+    public function getThemes()
+    {
+        return $this->themes;
+    }
+
+    public function setThemes($themes)
+    {
+        $this->themes = $themes;
+    }
+
+    /**
+     * @return Price[]
+     */
+    public function getPrices()
+    {
+        return $this->prices;
+    }
+
+
+    public function setPrices($prices)
+    {
+        $this->prices = $prices;
+        return $this;
+    }
+
     public function getId()
     {
         return $this->id;
@@ -68,4 +114,5 @@ class Place
         $this->address = $address;
         return $this;
     }
+
 }
