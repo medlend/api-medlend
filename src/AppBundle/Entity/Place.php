@@ -19,7 +19,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Place
 {
+
     /**
+     *  Identifiant unique du lieu
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue

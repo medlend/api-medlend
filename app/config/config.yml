@@ -8,6 +8,7 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
 
 framework:
     #esi:             ~
@@ -32,6 +33,8 @@ framework:
     fragments:       ~
     http_method_override: true
     assets: ~
+    serializer:
+        enabled: false
 
 # Twig Configuration
 twig:
@@ -68,6 +71,12 @@ swiftmailer:
     password:  "%mailer_password%"
     spool:     { type: memory }
 
+jms_serializer:
+    handlers:
+        datetime:
+            default_format: "Y-m-d\\TH:i:sP"
+            default_timezone: "UTC"
+
 fos_rest:
     routing_loader:
         include_format: false
@@ -81,3 +90,32 @@ fos_rest:
             - { path: '^/', priorities: ['json', 'xml'], fallback_format: 'json', prefer_extension: false }
     body_listener:
         enabled: true
+    exception:
+        enabled: true
+    param_fetcher_listener:
+        enabled: true
+    serializer:
+        serialize_null:  true
+
+nelmio_api_doc:
+    sandbox:
+        enabled:  true  # Juste pour la lisibilité car true est déjà la valeur par défaut
+        endpoint: http://localhost/api-medlend/web/app_dev.php
+
+        authentication:
+            name: X-Auth-Token
+            delivery: header
+
+        accept_type: application/json   # valeur par défaut de l'entête Accept
+
+        body_format:
+            formats: [ json, xml ]
+            default_format: json
+
+        request_format:
+            formats:
+                json: application/json
+                xml: application/xml
+
+            method: accept_header
+            default_format: json

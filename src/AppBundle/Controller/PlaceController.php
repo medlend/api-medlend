@@ -12,9 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations as Rest; // alias pour toutes les annotations
 use AppBundle\Form\Type\PlaceType;
 use AppBundle\Entity\Place;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class PlaceController extends Controller
 {
@@ -89,9 +92,23 @@ class PlaceController extends Controller
 
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @ApiDoc(
+     *    description="Crée un lieu dans l'application",
+     *    input={"class"=PlaceType::class, "name"=""},
+     *    statusCodes = {
+     *        201 = "Création avec succès",
+     *        400 = "Formulaire invalide"
+     *    },
+     *    responseMap={
+     *         201 = {"class"=Place::class, "groups"={"place"}},
+     *         400 = { "class"=PlaceType::class, "form_errors"=true, "name" = ""}
+     *    }
+     * )
+     *
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"place"})
      * @Rest\Post("/places")
      */
+    
     public function postPlacesAction(Request $request)
     {
         $place = new Place();
@@ -111,16 +128,44 @@ class PlaceController extends Controller
 
 
     /**
-     * @Rest\View()
+     *
+     * @ApiDoc(
+     *    description="Récupère la liste des lieux de l'application",
+     *    output= { "class"=Place::class, "collection"=true, "groups"={"place"} }
+     * )
+     * @Rest\View(serializerGroups={"place"})
      * @Rest\Get("/places")
+     * @QueryParam(name="offset", requirements="\d+", default="", description="Index de début de la pagination")
+     * @QueryParam(name="limit", requirements="\d+", default="", description="Nombre d'éléments à afficher")
+     * @QueryParam(name="sort", requirements="(asc|desc)", nullable=true, description="Ordre de tri (basé sur le nom)")
      */
-    public function getPlacesAction(Request $request)
+    public function getPlacesAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $places = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('AppBundle:Place')
-            ->findAll();
-        /* @var $places Place[] */
+        $offset = $paramFetcher->get('offset');
+        $limit = $paramFetcher->get('limit');
+        $sort = $paramFetcher->get('sort');
 
+        $qb = $this->get('doctrine.orm.entity_manager')->createQueryBuilder();
+        $qb->select('p')
+            ->from('AppBundle:Place', 'p');
+
+        if ($offset != "") {
+            $qb->setFirstResult($offset);
+        }
+
+        if ($limit != "") {
+            $qb->setMaxResults($limit);
+        }
+        if (in_array($sort, ['asc', 'desc'])) {
+            $qb->orderBy('p.name', $sort);
+        }
+
+        $places = $qb->getQuery()->getResult();
+/*
+GET rest-api.local/places?limit=5 permet de lister cinq lieux ;
+GET rest-api.local/places?offset=3 permet de lister tous les lieux en omettant les trois premiers lieux ;
+GET rest-api.local/places?offset=1&limit=2 permet de lister trois lieux en omettant les deux premiers lieux dans l'application.
+ */
         return $places;
     }
 
